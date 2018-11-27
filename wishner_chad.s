@@ -12,6 +12,8 @@
 		.asciz "00000000000000000000000000000000"
 	flush:
 		.asciz "\n"
+	chars:
+		.asciz "0123456789ABCDEF"
 
 .text
 .global main
@@ -33,16 +35,19 @@ main:
 	ldr x11, =printstring
 	
 	#instantiate variables for later use (x12 for division, x13 for string position pointer, w14 for ascii value)
-	mov x12, #2
+	mov x12, #16
 	mov x13, #31
-	mov w14, #49
+
+	#create string for "0123456789ABCDEF"
+	ldr x14, =chars
+	
 
 loop:
 	
 	#load x10 with either a 0 or 1 for the binary reprentation of the smallest digit
 	#tried using MOD, but it didnt work so i did it myself
 	
-	#x15 = x9/x12 (2)
+	#x15 = x9/x12 (16)
 	udiv x15, x9, x12 
 	#x16 = x15 * x12
 	mul x16, x15, x12
@@ -66,8 +71,12 @@ return:
 	b loop
 
 addbit:
-	#add the "1" in x11[x13]
-	strb w14, [x11, x13]
+	#load w17 with correct char, using offset (x10)
+	ldr w17, [x14, x10]
+	
+	#add the "character" in x11[x13]
+	strb w17, [x11, x13]
+
 	#return back to previous position in loop
 	b return
 
